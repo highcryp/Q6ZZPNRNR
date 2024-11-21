@@ -1,5 +1,39 @@
-Check if this is working.
-Hello World
+QUESTION 11 A
 
-New Lines check
-Seeing if it works real time
+import eikon as ek
+import pandas as pd
+
+ek.set_app_key("your_eikon_api_key")
+
+ticker = "SSE.L"
+
+ratios = {
+    "Current Ratio": "TR.TangibleCurrentAssets/ TR.TotalCurrentLiabilities",
+    "Quick Ratio": "(TR.TangibleCurrentAssets-TR.Inventory)/TR.TotalCurrentLiabilities"
+}
+
+df_liquidity_ratios = pd.DataFrame()
+
+for ratio_name, formula in ratios.items():
+    try:
+        data, err = ek.get_data(
+            instruments=ticker,
+            fields=formula,
+            parameters={"SDate": "-5Y", "EDate": "0D"}
+        )
+        if err:
+            print(f"Error fetching {ratio_name}: {err}")
+        else:
+            # Clean and store the data
+            data["Ratio"] = ratio_name
+            df_liquidity_ratios = pd.concat([df_liquidity_ratios, data])
+    except Exception as e:
+        print(f"Failed to fetch {ratio_name}: {e}")
+
+df_liquidity_ratios = df_liquidity_ratios[["Date", "Instrument", "Ratio", "Value"]]
+df_liquidity_ratios = df_liquidity_ratios.pivot(index="Date", columns="Ratio", values="Value")
+
+print(df_liquidity_ratios)
+
+df_liquidity_ratios.to_csv("sse_liquidity_ratios.csv")
+
