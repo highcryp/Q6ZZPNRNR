@@ -38,6 +38,7 @@ print(df_liquidity_ratios)
 df_liquidity_ratios.to_csv("sse_liquidity_ratios.csv")
 
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -53,5 +54,80 @@ average_growth_rates = growth_rates.mean()
 print(f"The average current ratio growth rate is {average_growth_rates['Current Ratio']:.2%}")
 print(f"The average quick ratio growth rate is {average_growth_rates['Quick Ratio']:.2%}")
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+QUESTION 11C
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 6))
+plt.plot(df_liquidity_ratios.index, df_liquidity_ratios['Current Ratio'], label='Current Ratio', marker='o')
+plt.plot(df_liquidity_ratios.index, df_liquidity_ratios['Quick Ratio'], label='Quick Ratio', marker='s')
+
+plt.title("Time Series of Liquidity Ratios for SSE plc", fontsize=14)
+plt.xlabel("Date", fontsize=12)
+plt.ylabel("Ratio Value", fontsize=12)
+
+plt.legend()
+
+plt.grid(True)
+plt.show()
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+QUESTION 12 A
+
+import eikon as ek
+import pandas as pd
+
+ek.set_app_key("your_eikon_api_key")
+
+jd_ticker = "JD.L"
+ftse_ticker = ".FTSE"
+
+jd_data, jd_err = ek.get_timeseries(jd_ticker, "CLOSE", interval="daily", start_date="-1Y")
+ftse_data, ftse_err = ek.get_timeseries(ftse_ticker, "CLOSE", interval="daily", start_date="-1Y")
+
+price_data = pd.DataFrame({
+    "JD_Close": jd_data["CLOSE"],
+    "FTSE_Close": ftse_data["CLOSE"]
+})
+
+price_data.dropna(inplace=True)
+
+print(price_data.head())
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+QUESTION 12 B
+
+price_data["JD_Return"] = price_data["JD_Close"].pct_change()
+price_data["FTSE_Return"] = price_data["FTSE_Close"].pct_change()
+
+price_data.dropna(inplace=True)
+
+print(price_data[["JD_Return", "FTSE_Return"]].head())
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+QUESTION 12 C
+
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+X = price_data["FTSE_Return"].values.reshape(-1, 1) 
+y = price_data["JD_Return"].values 
+
+model = LinearRegression()
+model.fit(X, y)
+
+beta = model.coef_[0]
+
+print(f"The beta value for JD Sports Fashion plc is {beta:.4f}")
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
