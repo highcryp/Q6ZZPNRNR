@@ -37,3 +37,21 @@ print(df_liquidity_ratios)
 
 df_liquidity_ratios.to_csv("sse_liquidity_ratios.csv")
 
+
+
+
+
+
+QUESTION 11 B
+
+growth_rates = df_liquidity_ratios.pct_change()
+
+growth_rates = growth_rates.dropna()
+
+average_growth_rates = growth_rates.mean()
+
+print(f"The average current ratio growth rate is {average_growth_rates['Current Ratio']:.2%}")
+print(f"The average quick ratio growth rate is {average_growth_rates['Quick Ratio']:.2%}")
+
+
+
